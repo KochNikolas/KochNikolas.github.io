@@ -130,7 +130,8 @@
       align-items: center;
     }
 
-    .slide img {
+    .slide img,
+    .slide video {
       width: 100%;
       height: auto;
       display: block;
@@ -153,7 +154,8 @@
       background: rgba(0, 0, 0, 0.6);
     }
 
-    .lightbox img {
+    .lightbox img,
+    .lightbox video {
       position: fixed;
       border-radius: 12px;
       box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
@@ -314,6 +316,14 @@
       font-weight: 500;
     }
 
+    .links .icon {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      vertical-align: -3px;
+      margin-right: 9px;
+    }
+
     /* ------- Eingangsanimation ------- */
     @keyframes letter-in {
       from {
@@ -407,11 +417,11 @@
         <div class="carousel">
           <div class="carousel-track">
             <figure class="slide">
-              <img src="Projekt1/screenshot-1.png" alt="Companies overview with active job postings">
+              <video src="Projekt1/demo.mp4" autoplay muted loop playsinline
+                aria-label="Short demo of the application"></video>
               <figcaption>
-                <h4>Companies</h4>
-                <p>An overview of all tracked companies with industry, size,
-                  location and the number of currently active postings.</p>
+                <h4>Demo</h4>
+                <p>A short walkthrough of the application in action.</p>
               </figcaption>
             </figure>
             <figure class="slide">
@@ -454,9 +464,14 @@
       <h2>Contact</h2>
       <p>Feel free to reach out about projects or opportunities to work together.</p>
       <p class="links">
-        <a class="mail" href="mailto:nikolas@koch-satrup.de">nikolas@koch-satrup.de</a>
-        <a class="mail" href="https://www.linkedin.com/in/nikolas-koch-106b41259/" target="_blank"
-          rel="noopener">LinkedIn&nbsp;↗</a>
+        <a class="mail" href="mailto:nikolas@koch-satrup.de">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4.24-8 5-8-5V6.3l8 5 8-5v1.94z"/>
+          </svg>nikolas@koch-satrup.de</a>
+        <a class="mail" href="https://www.linkedin.com/in/nikolas-koch-106b41259/" target="_blank" rel="noopener">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/>
+          </svg>LinkedIn</a>
       </p>
     </div>
   </section>
@@ -519,16 +534,34 @@
 
     update();
 
-    // Lightbox: Bild zoomt per Klick fast bildschirmfüllend heraus,
-    // mit Pfeilen (oder Pfeiltasten) blättert man durch alle Bilder
-    const lightboxImgs = [...document.querySelectorAll('.slide img')];
+    // Lightbox: Bild/Video zoomt per Klick fast bildschirmfüllend heraus,
+    // mit Pfeilen (oder Pfeiltasten) blättert man durch alle Medien
+    const lightboxImgs = [...document.querySelectorAll('.slide img, .slide video')];
 
     lightboxImgs.forEach((img, i) => {
       img.addEventListener('click', () => openLightbox(i));
     });
 
+    // Erzeugt die große Kopie eines Slide-Mediums (Bild oder Video)
+    function makeClone(el) {
+      if (el.tagName === 'VIDEO') {
+        const v = document.createElement('video');
+        v.src = el.currentSrc || el.src;
+        v.muted = true;
+        v.autoplay = true;
+        v.loop = true;
+        v.playsInline = true;
+        v.currentTime = el.currentTime;
+        return v;
+      }
+      const img = document.createElement('img');
+      img.src = el.src;
+      img.alt = el.alt;
+      return img;
+    }
+
     function fitSize(img) {
-      const ratio = img.naturalWidth / img.naturalHeight;
+      const ratio = (img.naturalWidth || img.videoWidth) / (img.naturalHeight || img.videoHeight);
       let w = window.innerWidth * 0.92;
       let h = w / ratio;
       if (h > window.innerHeight * 0.92) {
@@ -553,9 +586,7 @@
       const overlay = document.createElement('div');
       overlay.className = 'lightbox';
 
-      let big = document.createElement('img');
-      big.src = lightboxImgs[cur].src;
-      big.alt = lightboxImgs[cur].alt;
+      let big = makeClone(lightboxImgs[cur]);
       Object.assign(big.style, rectStyle(lightboxImgs[cur]));
 
       const closeBtn = document.createElement('button');
@@ -604,9 +635,7 @@
 
         // Neues Bild kommt von der Seite herein, das alte gleitet hinaus —
         // derselbe Swap wie im kleinen Slider
-        const incoming = document.createElement('img');
-        incoming.src = lightboxImgs[cur].src;
-        incoming.alt = lightboxImgs[cur].alt;
+        const incoming = makeClone(lightboxImgs[cur]);
         Object.assign(incoming.style, fitSize(lightboxImgs[cur]));
         incoming.style.transform = `translateX(${dir * window.innerWidth}px)`;
         overlay.insertBefore(incoming, closeBtn);
