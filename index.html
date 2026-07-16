@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nikolas Koch</title>
+  <meta name="description" content="Portfolio of Nikolas Koch">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --text: #1d1d1f;
+      --text-soft: #86868b;
+      --surface: #f5f5f7;
+      --line: #d2d2d7;
+      --link: #0066cc;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: #fff;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .container {
+      max-width: 940px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    /* ------- Kopf ------- */
+    header {
+      padding: 120px 0 100px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 56px;
+    }
+
+    .hero img {
+      width: 260px;
+      height: 320px;
+      border-radius: 24px;
+      object-fit: cover;
+    }
+
+    h1 {
+      font-size: clamp(40px, 7vw, 60px);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+      margin-bottom: 20px;
+    }
+
+    .facts {
+      font-size: 19px;
+      font-weight: 500;
+      color: var(--text-soft);
+      letter-spacing: -0.01em;
+    }
+
+    /* ------- Abschnitte ------- */
+    section {
+      padding: 88px 0;
+    }
+
+    section.alt {
+      background: var(--surface);
+    }
+
+    h2 {
+      font-size: clamp(28px, 5vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 48px;
+    }
+
+    /* ------- Projekt ------- */
+    .project h3 {
+      font-size: clamp(28px, 5vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 8px;
+    }
+
+    .project .tech {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-soft);
+      margin-bottom: 40px;
+    }
+
+    /* ------- Screenshot-Slider ------- */
+    .carousel {
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .slide {
+      flex: 0 0 100%;
+      display: grid;
+      grid-template-columns: 2.2fr 1fr;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .slide img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      cursor: zoom-in;
+    }
+
+    /* ------- Lightbox ------- */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0);
+      transition: background 0.45s ease;
+      cursor: zoom-out;
+    }
+
+    .lightbox.open {
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .lightbox img {
+      position: fixed;
+      border-radius: 12px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      transition: top 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        left 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .lightbox .arrow {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.9);
+      color: #1d1d1f;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 3px;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+    }
+
+    .lightbox .arrow.prev {
+      left: 20px;
+    }
+
+    .lightbox .arrow.next {
+      right: 20px;
+    }
+
+    .lightbox.open .arrow {
+      opacity: 1;
+    }
+
+    .lightbox.open .arrow.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .carousel-nav button:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .carousel-nav button:disabled:hover {
+      background: #fff;
+    }
+
+    .lightbox .close {
+      position: fixed;
+      top: 24px;
+      right: 28px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.9);
+      color: #1d1d1f;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+    }
+
+    .lightbox.open .close {
+      opacity: 1;
+    }
+
+    .slide h4 {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+
+    .slide p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text-soft);
+    }
+
+    .carousel-nav {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+
+    .carousel-nav button {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease;
+      padding-bottom: 2px;
+    }
+
+    .carousel-nav button:hover {
+      background: #ebebef;
+    }
+
+    .carousel-nav .count {
+      font-size: 14px;
+      color: var(--text-soft);
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 680px) {
+      .slide {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+    }
+
+    .links a {
+      font-size: 17px;
+      font-weight: 500;
+      margin-right: 32px;
+    }
+
+    .project+.project {
+      margin-top: 72px;
+      padding-top: 72px;
+      border-top: 1px solid var(--line);
+    }
+
+    /* ------- Kontakt ------- */
+    .contact p {
+      font-size: 19px;
+      max-width: 540px;
+      margin-bottom: 28px;
+    }
+
+    .contact a.mail {
+      font-size: 19px;
+      font-weight: 500;
+    }
+
+    /* ------- Eingangsanimation ------- */
+    @keyframes letter-in {
+      from {
+        opacity: 0;
+        transform: translateY(0.35em);
+        filter: blur(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes photo-in {
+      from {
+        opacity: 0;
+        transform: rotate(-4deg) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: rotate(0deg) scale(1);
+      }
+    }
+
+    .letter {
+      display: inline-block;
+      opacity: 0;
+      animation: letter-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .hero img {
+      opacity: 0;
+      animation: photo-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.08s forwards;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .letter,
+      .hero img {
+        opacity: 1;
+        animation: none;
+        filter: none;
+      }
+    }
+
+    @media (max-width: 680px) {
+      header {
+        padding: 80px 0 64px;
+      }
+
+      section {
+        padding: 64px 0;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+
+      .hero img {
+        order: -1;
+        width: 200px;
+        height: 248px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="container">
+      <div class="hero">
+        <div>
+          <h1>Nikolas Koch</h1>
+          <p class="facts">Born March 4, 2004<br>Media Informatics student</p>
+        </div>
+        <img src="Hero/profile.jpeg" alt="Nikolas Koch">
+      </div>
+    </div>
+  </header>
+
+  <section class="alt">
+    <div class="container">
+      <div class="project">
+        <!-- Update project name, description and links -->
+        <h3>Job Finder</h3>
+        <p class="tech">Frontend · Database · Notion workflow</p>
+        <div class="carousel">
+          <div class="carousel-track">
+            <figure class="slide">
+              <img src="Projekt1/screenshot-1.png" alt="Companies overview with active job postings">
+              <figcaption>
+                <h4>Companies</h4>
+                <p>An overview of all tracked companies with industry, size,
+                  location and the number of currently active postings.</p>
+              </figcaption>
+            </figure>
+            <figure class="slide">
+              <img src="Projekt1/screenshot-2.png" alt="Automated workflow that collects job postings">
+              <figcaption>
+                <h4>Automation</h4>
+                <p>A scheduled workflow runs in the background. It loads each
+                  company's career page, extracts the job postings and writes
+                  them to the database fully automatically.</p>
+              </figcaption>
+            </figure>
+            <figure class="slide">
+              <img src="Projekt1/screenshot-3.png" alt="Job listings overview with tags and filters">
+              <figcaption>
+                <h4>Job overview</h4>
+                <p>All collected job postings in one place. They can be searched
+                  and filtered by date, employment type, location and custom tags.</p>
+              </figcaption>
+            </figure>
+            <!-- More slides: copy a <figure class="slide"> block and update image + text -->
+          </div>
+        </div>
+        <div class="carousel-nav">
+          <button type="button" data-dir="-1" aria-label="Previous screenshot">‹</button>
+          <button type="button" data-dir="1" aria-label="Next screenshot">›</button>
+          <span class="count"></span>
+        </div>
+        <p class="links">
+          <a href="https://jc.webdesign-koch.de" target="_blank" rel="noopener">View project&nbsp;↗</a>
+          <a href="https://github.com/your-username/your-repo" target="_blank" rel="noopener">Code on GitHub</a>
+        </p>
+      </div>
+
+      <!-- To add more projects, duplicate the <div class="project"> block above -->
+
+    </div>
+  </section>
+
+  <section class="contact">
+    <div class="container">
+      <h2>Contact</h2>
+      <p>Feel free to reach out about projects or opportunities to work together.</p>
+      <p class="links">
+        <a class="mail" href="mailto:nikolas@koch-satrup.de">nikolas@koch-satrup.de</a>
+        <a class="mail" href="https://www.linkedin.com/in/nikolas-koch-106b41259/" target="_blank"
+          rel="noopener">LinkedIn&nbsp;↗</a>
+      </p>
+    </div>
+  </section>
+
+  <script>
+    // Text in einzelne Buchstaben zerlegen, die gestaffelt einfaden.
+    // Gibt den Zeitpunkt zurück, an dem der letzte Buchstabe fertig ist.
+    const LETTER_DURATION = 0.7;
+
+    function splitLetters(el, start, step) {
+      const nodes = [...el.childNodes];
+      el.setAttribute('aria-label', el.textContent);
+      el.innerHTML = '';
+      let delay = start;
+
+      nodes.forEach((node) => {
+        if (node.nodeType !== Node.TEXT_NODE) {
+          el.appendChild(node.cloneNode());
+          return;
+        }
+        [...node.textContent].forEach((char) => {
+          const span = document.createElement('span');
+          span.className = 'letter';
+          span.setAttribute('aria-hidden', 'true');
+          span.textContent = char === ' ' ? ' ' : char;
+          span.style.animationDelay = `${delay}s`;
+          el.appendChild(span);
+          delay += step;
+        });
+      });
+
+      return delay - step + LETTER_DURATION;
+    }
+
+    const nameEnd = splitLetters(document.querySelector('h1'), 0.08, 0.045);
+    splitLetters(document.querySelector('.facts'), nameEnd / 2, 0.018);
+
+    // Screenshot-Slider (ohne Umlauf: am Anfang/Ende ist Schluss)
+    const track = document.querySelector('.carousel-track');
+    const slides = track.children.length;
+    const count = document.querySelector('.carousel-nav .count');
+    const navButtons = [...document.querySelectorAll('.carousel-nav button')];
+    let index = 0;
+
+    function update() {
+      track.style.transform = `translateX(-${index * 100}%)`;
+      count.textContent = `${index + 1} / ${slides}`;
+      navButtons.forEach((btn) => {
+        const target = index + Number(btn.dataset.dir);
+        btn.disabled = target < 0 || target >= slides;
+      });
+    }
+
+    navButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        index = Math.min(Math.max(index + Number(btn.dataset.dir), 0), slides - 1);
+        update();
+      });
+    });
+
+    update();
+
+    // Lightbox: Bild zoomt per Klick fast bildschirmfüllend heraus,
+    // mit Pfeilen (oder Pfeiltasten) blättert man durch alle Bilder
+    const lightboxImgs = [...document.querySelectorAll('.slide img')];
+
+    lightboxImgs.forEach((img, i) => {
+      img.addEventListener('click', () => openLightbox(i));
+    });
+
+    function fitSize(img) {
+      const ratio = img.naturalWidth / img.naturalHeight;
+      let w = window.innerWidth * 0.92;
+      let h = w / ratio;
+      if (h > window.innerHeight * 0.92) {
+        h = window.innerHeight * 0.92;
+        w = h * ratio;
+      }
+      return {
+        top: `${(window.innerHeight - h) / 2}px`,
+        left: `${(window.innerWidth - w) / 2}px`,
+        width: `${w}px`,
+        height: `${h}px`,
+      };
+    }
+
+    function rectStyle(el) {
+      const r = el.getBoundingClientRect();
+      return { top: `${r.top}px`, left: `${r.left}px`, width: `${r.width}px`, height: `${r.height}px` };
+    }
+
+    function openLightbox(start) {
+      let cur = start;
+      const overlay = document.createElement('div');
+      overlay.className = 'lightbox';
+
+      let big = document.createElement('img');
+      big.src = lightboxImgs[cur].src;
+      big.alt = lightboxImgs[cur].alt;
+      Object.assign(big.style, rectStyle(lightboxImgs[cur]));
+
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'close';
+      closeBtn.setAttribute('aria-label', 'Close');
+      closeBtn.textContent = '✕';
+
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'arrow prev';
+      prevBtn.setAttribute('aria-label', 'Previous image');
+      prevBtn.textContent = '‹';
+
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'arrow next';
+      nextBtn.setAttribute('aria-label', 'Next image');
+      nextBtn.textContent = '›';
+
+      function updateArrows() {
+        prevBtn.classList.toggle('hidden', cur === 0);
+        nextBtn.classList.toggle('hidden', cur === lightboxImgs.length - 1);
+      }
+
+      overlay.append(big, closeBtn, prevBtn, nextBtn);
+      document.body.appendChild(overlay);
+      updateArrows();
+      document.body.style.overflow = 'hidden'; // Scrollen sperren, solange das Bild groß ist
+      big.getBoundingClientRect(); // Layout erzwingen, damit die Animation vom Startwert läuft
+
+      requestAnimationFrame(() => {
+        overlay.classList.add('open');
+        Object.assign(big.style, fitSize(lightboxImgs[cur]));
+      });
+
+      let animating = false;
+
+      function goTo(next, dir) {
+        if (animating) return;
+        animating = true;
+        if (next < 0 || next >= lightboxImgs.length) { animating = false; return; }
+        cur = next;
+        updateArrows();
+        // Slider im Hintergrund mitführen, damit das Bild beim
+        // Schließen an die sichtbare Stelle zurückkehrt
+        index = cur;
+        update();
+
+        // Neues Bild kommt von der Seite herein, das alte gleitet hinaus —
+        // derselbe Swap wie im kleinen Slider
+        const incoming = document.createElement('img');
+        incoming.src = lightboxImgs[cur].src;
+        incoming.alt = lightboxImgs[cur].alt;
+        Object.assign(incoming.style, fitSize(lightboxImgs[cur]));
+        incoming.style.transform = `translateX(${dir * window.innerWidth}px)`;
+        overlay.insertBefore(incoming, closeBtn);
+        incoming.getBoundingClientRect();
+
+        big.style.transform = `translateX(${-dir * window.innerWidth}px)`;
+        incoming.style.transform = 'translateX(0)';
+
+        const outgoing = big;
+        big = incoming;
+        outgoing.addEventListener('transitionend', () => {
+          outgoing.remove();
+          animating = false;
+        }, { once: true });
+      }
+
+      function close() {
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+        Object.assign(big.style, rectStyle(lightboxImgs[cur]));
+        big.addEventListener('transitionend', () => overlay.remove(), { once: true });
+        document.removeEventListener('keydown', onKey);
+      }
+
+      function onKey(e) {
+        if (e.key === 'Escape') close();
+        if (e.key === 'ArrowLeft') goTo(cur - 1, -1);
+        if (e.key === 'ArrowRight') goTo(cur + 1, 1);
+      }
+
+      prevBtn.addEventListener('click', (e) => { e.stopPropagation(); goTo(cur - 1, -1); });
+      nextBtn.addEventListener('click', (e) => { e.stopPropagation(); goTo(cur + 1, 1); });
+      overlay.addEventListener('click', close);
+      document.addEventListener('keydown', onKey);
+    }
+  </script>
+
+</body>
+
+</html>
